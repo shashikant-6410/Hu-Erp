@@ -1,4 +1,5 @@
 import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getStudentDashboard } from '../../services/dashboard.service';
 import {
@@ -14,6 +15,7 @@ import {
 
 const StudentDashboard = () => {
     const { user, profile } = useAuth();
+    const navigate = useNavigate();
     const {
   data,
   isLoading,
@@ -173,13 +175,14 @@ const stats = [
                         <div className="card-body">
                             <div className="space-y-3">
                                 {[
-                                    { icon: Calendar, label: 'View Attendance', color: 'primary' },
+                                    { icon: Calendar, label: 'View Attendance', color: 'primary', path: '/student/attendance' },
                                     { icon: FileText, label: 'Check Results', color: 'success' },
                                     { icon: DollarSign, label: 'Pay Fees', color: 'warning' },
                                     { icon: Users, label: 'My Courses', color: 'secondary' },
                                 ].map((action, index) => (
                                     <button
                                         key={index}
+                                        onClick={() => action.path && navigate(action.path)}
                                         className="w-full flex items-center p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                     >
                                         <action.icon className={`h-5 w-5 text-${action.color}-600`} />
