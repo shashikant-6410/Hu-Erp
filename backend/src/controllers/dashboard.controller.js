@@ -32,6 +32,21 @@ class DashboardController {
       }
     });
   });
+    getStudentDashboard = asyncHandler(async (req, res) => {
+    // req.user is available because authenticate middleware ran
+    // We are NOT using database yet
+
+    res.status(200).json({
+      success: true,
+      data: {
+        attendance: 0,
+        cgpa: 0,
+        pendingFees: 0,
+        activeCourses: 0,
+      },
+    });
+  });
+
 }
 
 export default new DashboardController();

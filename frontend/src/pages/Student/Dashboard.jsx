@@ -1,4 +1,6 @@
 import { useAuth } from '../../hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { getStudentDashboard } from '../../services/dashboard.service';
 import {
     BookOpen,
     Calendar,
@@ -12,37 +14,55 @@ import {
 
 const StudentDashboard = () => {
     const { user, profile } = useAuth();
+    const {
+  data,
+  isLoading,
+  isError,
+} = useQuery({
+  queryKey: ['student-dashboard'],
+  queryFn: getStudentDashboard,
+});
 
-    const stats = [
-        {
-            name: 'Attendance',
-            value: '87.5%',
-            change: '+2.5%',
-            icon: Calendar,
-            color: 'primary',
-        },
-        {
-            name: 'CGPA',
-            value: '8.42',
-            change: '+0.12',
-            icon: Award,
-            color: 'success',
-        },
-        {
-            name: 'Pending Fees',
-            value: '₹15,000',
-            change: '-₹5,000',
-            icon: DollarSign,
-            color: 'warning',
-        },
-        {
-            name: 'Courses',
-            value: '6',
-            change: 'Active',
-            icon: BookOpen,
-            color: 'secondary',
-        },
-    ];
+
+    if (isLoading) {
+  return <div className="p-8">Loading dashboard...</div>;
+}
+
+if (isError) {
+  return <div className="p-8 text-red-500">Failed to load dashboard</div>;
+}
+
+const stats = [
+  {
+    name: 'Attendance',
+    value: `${data.attendance}%`,
+    change: '',
+    icon: Calendar,
+    color: 'primary',
+  },
+  {
+    name: 'CGPA',
+    value: data.cgpa,
+    change: '',
+    icon: Award,
+    color: 'success',
+  },
+  {
+    name: 'Pending Fees',
+    value: `₹${data.pendingFees}`,
+    change: '',
+    icon: DollarSign,
+    color: 'warning',
+  },
+  {
+    name: 'Courses',
+    value: data.activeCourses,
+    change: 'Active',
+    icon: BookOpen,
+    color: 'secondary',
+  },
+];
+
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
