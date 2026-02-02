@@ -52,9 +52,19 @@ const StudentDashboard = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white">
-                                Welcome back,{' '}
-                                {profile?.firstName || user?.email?.split('@')[0]}! 👋
-                            </h1>
+  Welcome back,{' '}
+  {profile?.firstName ||
+    user?.email
+      ?.split("@")[0]      // riyajindal.bcse2024
+      .split(".")[0]      // riyajindal
+      .replace(/^(.{4})(.*)$/, (_, first, last) =>
+        first.charAt(0).toUpperCase() +
+        first.slice(1) +
+        " " +
+        last.charAt(0).toUpperCase() +
+        last.slice(1)
+      )}! 👋
+</h1>
                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                 {profile?.enrollmentNumber && `Enrollment: ${profile.enrollmentNumber}`}
                             </p>
