@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { z } from 'zod';
 
 dotenv.config();
+console.log('✅ SMTP_USER from env:', process.env.SMTP_USER);
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
