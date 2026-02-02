@@ -6,6 +6,13 @@ const router = express.Router();
 
 router.use(authenticate);
 
+//Admin dashboard stats
 router.get('/stats', authorize('ADMIN', 'SUPER_ADMIN'), dashboardController.getStats);
+// Student dashboard summary
+router.get(
+  '/student',
+  authorize('STUDENT'),
+  dashboardController.getStudentDashboard
+);
 
 export default router;
