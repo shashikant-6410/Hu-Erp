@@ -12,7 +12,8 @@ class AuthService {
    * Register a new user
    */
   async register(data) {
-    const { email, password, role, profileData } = data;
+    console.log('Auth service received data:', data);
+    const { email, password, role, profileData, firstName, lastName } = data;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email }).select('+isDeleted');
@@ -25,6 +26,8 @@ class AuthService {
       email,
       password,
       role,
+      firstName,
+      lastName,
       emailVerified: false,
     });
 

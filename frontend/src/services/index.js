@@ -5,7 +5,9 @@ export { subjectService };
 
 export const authService = {
   // Register
+  
   register: async (data) => {
+    console.log("data",data)
     return api.post('/auth/register', data);
   },
 

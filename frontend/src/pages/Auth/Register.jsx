@@ -8,7 +8,8 @@ import { Mail, Lock, User, Loader2, GraduationCap, Briefcase } from 'lucide-reac
 import toast from 'react-hot-toast';
 
 const registerSchema = z.object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
+    firstName: z.string().min(2, 'First name must be at least 2 characters'),
+    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
     email: z.string().email('Invalid email address'),
     password: z.string()
         .min(8, 'Password must be at least 8 characters')
@@ -40,18 +41,38 @@ const Register = () => {
     const selectedRole = watch('role');
 
     const onSubmit = async (data) => {
+        console.log('=== FORM SUBMISSION DEBUG ===');
+        console.log('Raw form data:', data);
+        console.log('firstName:', data.firstName);
+        console.log('lastName:', data.lastName);
+        console.log('email:', data.email);
+        console.log('role:', data.role);
+        
         setIsLoading(true);
         try {
-            await registerUser({
+            const registrationData = {
+                firstName: data.firstName,
+                lastName: data.lastName,
                 email: data.email,
                 password: data.password,
                 role: data.role
-            });
-            toast.success('Registration successful! Please login.');
-            navigate('/login');
+            };
+            console.log('Final registration data:', registrationData);
+            const result = await registerUser(registrationData);
+            
+            // Navigate to dashboard based on role after successful registration
+            if (result && result?.user?.role) {
+                if (result?.user?.role === 'STUDENT') {
+                    navigate('/student/dashboard');
+                } else if (result?.user?.role === 'FACULTY') {
+                    navigate('/faculty/dashboard');
+                } else if (result?.user?.role === 'ADMIN' || result?.user?.role === 'SUPER_ADMIN') {
+                    navigate('/admin/dashboard');
+                }
+            }
         } catch (error) {
             console.error('Registration failed:', error);
-            // Error handling is managed by the auth hook/service usually
+            console.error('Error response:', error.response?.data);
         } finally {
             setIsLoading(false);
         }
@@ -105,25 +126,47 @@ const Register = () => {
                                 </label>
                             </div>
 
-                            {/* Name Field */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Full Name
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <User className="h-5 w-5 text-gray-400" />
+                            {/* Name Fields */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        First Name
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <User className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            {...register('firstName')}
+                                            type="text"
+                                            className={`input pl-10 ${errors.firstName ? 'input-error' : ''}`}
+                                            placeholder="First name"
+                                        />
                                     </div>
-                                    <input
-                                        {...register('name')}
-                                        type="text"
-                                        className={`input pl-10 ${errors.name ? 'input-error' : ''}`}
-                                        placeholder="Enter your name"
-                                    />
+                                    {errors.firstName && (
+                                        <p className="mt-1 text-sm text-danger-600">{errors.firstName.message}</p>
+                                    )}
                                 </div>
-                                {errors.name && (
-                                    <p className="mt-1 text-sm text-danger-600">{errors.name.message}</p>
-                                )}
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        Last Name
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <User className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            {...register('lastName')}
+                                            type="text"
+                                            className={`input pl-10 ${errors.lastName ? 'input-error' : ''}`}
+                                            placeholder="Last name"
+                                        />
+                                    </div>
+                                    {errors.lastName && (
+                                        <p className="mt-1 text-sm text-danger-600">{errors.lastName.message}</p>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Email Field */}

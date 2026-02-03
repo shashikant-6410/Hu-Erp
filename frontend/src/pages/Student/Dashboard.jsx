@@ -77,8 +77,8 @@ const stats = [
   Welcome back,{' '}
   {profile?.firstName ||
     user?.email
-      ?.split("@")[0]      // riyajindal.bcse2024
-      .split(".")[0]      // riyajindal
+      ?.split("@")[0]      
+      .split(".")[0]      
       .replace(/^(.{4})(.*)$/, (_, first, last) =>
         first.charAt(0).toUpperCase() +
         first.slice(1) +
@@ -178,7 +178,7 @@ const stats = [
                                     { icon: Calendar, label: 'View Attendance', color: 'primary', path: '/student/attendance' },
                                     { icon: FileText, label: 'Check Results', color: 'success' },
                                     { icon: DollarSign, label: 'Pay Fees', color: 'warning' },
-                                    { icon: Users, label: 'My Courses', color: 'secondary' },
+                                    { icon: Users, label: 'My Courses', color: 'secondary', path: '/student/courses' },
                                 ].map((action, index) => (
                                     <button
                                         key={index}

@@ -10,6 +10,14 @@ class AuthController {
    * POST /api/v1/auth/register
    */
   register = asyncHandler(async (req, res) => {
+    console.log('=== BACKEND REGISTRATION DEBUG ===');
+    console.log('Request body keys:', Object.keys(req.body));
+    console.log('Request body:', req.body);
+    console.log('firstName:', req.body.firstName);
+    console.log('lastName:', req.body.lastName);
+    console.log('email:', req.body.email);
+    console.log('role:', req.body.role);
+    
     const result = await authService.register(req.body);
 
     res.status(201).json({
@@ -239,7 +247,7 @@ class AuthController {
     if (!user.loginOtp || !user.loginOtpExpires) { 
         return res.status(400).json({
             success: false,
-            message: 'OTP not expired or invalid'
+            message: 'No OTP generated for this email'
         });
     }
 
@@ -255,9 +263,10 @@ class AuthController {
     }
 
     // Create tokens
-    const tokens = await authService.generateTokens(user);
+    const tokens = authService.generateTokens(user);
 
-    // Clear OTP
+    // Save refresh token and clear OTP in one save
+    user.addRefreshToken(tokens.refreshToken);
     user.loginOtp = undefined;
     user.loginOtpExpires = undefined;
     await user.save({ validateBeforeSave: false });

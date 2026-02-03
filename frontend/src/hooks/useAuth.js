@@ -112,12 +112,15 @@ export const useAuth = () => {
   };
 
   const register = async (data) => {
+    console.log(data)
     try {
       dispatch(setLoading(true));
       const response = await authService.register(data);
       
       if (response.success) {
-        toast.success('Registration successful! Please verify your email.');
+        // Update Redux state with the new user data
+        dispatch(setCredentials(response.data));
+        toast.success('Registration successful! Welcome!');
         return response.data;
       }
     } catch (error) {
