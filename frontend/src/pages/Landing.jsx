@@ -78,7 +78,7 @@ const Landing = () => {
         <div
           className="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
           style={{
-            backgroundImage: `url(${isDarkMode ? '/src/assets/heroImageDark.avif' : '/src/assets/heroImage.avif'})`,
+            backgroundImage: "url('/src/assets/HeroImage.avif')",
           }}
         ></div>
         <div className="absolute inset-0 bg-black/40 dark:bg-black/70"></div>
