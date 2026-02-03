@@ -14,12 +14,11 @@ const startServer = async () => {
     // Connect to MongoDB
     await database.connect();
 
-    // Connect to Redis (optional)
-    try {
-      await redisClient.connect();
-    } catch (redisError) {
+    // Connect to Redis (optional - don't block server startup)
+    redisClient.connect().catch((redisError) => {
       logger.warn('⚠️ Redis connection failed, running without caching');
-    }
+      logger.warn('Redis Error:', redisError.message);
+    });
 
     // Start Express server
     server = app.listen(env.PORT, () => {
@@ -46,7 +45,7 @@ const startServer = async () => {
       server.close(async () => {
         logger.info('Process terminated!');
         await database.disconnect();
-        await redisClient.disconnect();
+        redisClient.disconnect().catch(() => {}); // Don't wait for Redis
         process.exit(0);
       });
     });
@@ -58,7 +57,7 @@ const startServer = async () => {
       server.close(async () => {
         logger.info('Process terminated!');
         await database.disconnect();
-        await redisClient.disconnect();
+        redisClient.disconnect().catch(() => {}); // Don't wait for Redis
         process.exit(0);
       });
     });
