@@ -69,6 +69,16 @@ export const authService = {
   verifyEmail: async (token) => {
     return api.post('/auth/verify-email', { token });
   },
+
+  // Send password reset OTP
+  sendPasswordResetOtp: async (email) => {
+    return api.post('/auth/send-password-reset-otp', { email });
+  },
+
+  // Verify password reset OTP
+  verifyPasswordResetOtp: async (email, otp) => {
+    return api.post('/auth/verify-password-reset-otp', { email, otp });
+  },
 };
 
 export const studentService = {

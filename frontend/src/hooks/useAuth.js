@@ -129,6 +129,57 @@ export const useAuth = () => {
     }
   };
 
+  const sendPasswordResetOtp = async (email) => {
+    try {
+      dispatch(setLoading(true));
+      const response = await authService.forgotPassword(email);
+      if (response.success) {
+        toast.success('Reset code sent to your email');
+        return response.data;
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to send reset code';
+      toast.error(message);
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+  const verifyPasswordResetOtp = async (email, otp) => {
+    try {
+      dispatch(setLoading(true));
+      const response = await authService.verifyPasswordResetOtp(email, otp);
+      if (response.success) {
+        toast.success('Code verified successfully');
+        return response.data;
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Invalid or expired code';
+      toast.error(message);
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+  const resetPassword = async (token, password) => {
+    try {
+      dispatch(setLoading(true));
+      const response = await authService.resetPassword(token, password);
+      if (response.success) {
+        toast.success('Password reset successfully!');
+        return response.data;
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'Password reset failed';
+      toast.error(message);
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
   const logout = async () => {
     try {
       await authService.logout();
@@ -160,6 +211,9 @@ export const useAuth = () => {
     loginWithOtp,
     register,
     logout,
+    sendPasswordResetOtp,
+    verifyPasswordResetOtp,
+    resetPassword,
     hasRole,
   };
 };

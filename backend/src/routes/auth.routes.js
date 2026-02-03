@@ -64,6 +64,20 @@ router.post(
   authController.verifyEmail
 );
 
+router.post(
+  '/send-password-reset-otp',
+  authLimiter,
+  validate(authValidator.sendOtpSchema),
+  authController.sendPasswordResetOtp
+);
+
+router.post(
+  '/verify-password-reset-otp',
+  authLimiter,
+  validate(authValidator.loginWithOtpSchema),
+  authController.verifyPasswordResetOtp
+);
+
 // Protected routes
 router.post('/logout', authenticate, authController.logout);
 router.get('/me', authenticate, authController.getCurrentUser);

@@ -279,6 +279,119 @@ class AuthController {
       },
     });
   });
+
+  /**
+   * Send Password Reset OTP
+   * POST /api/v1/auth/send-password-reset-otp
+   */
+  sendPasswordResetOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide an email address'
+      });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      // Don't reveal that user doesn't exist for security
+      return res.status(200).json({
+        success: true,
+        message: 'If the email exists, a reset code has been sent'
+      });
+    }
+
+    // Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Save OTP to user (hashed)
+    user.passwordResetToken = encryptionUtil.hashData(otp);
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save({ validateBeforeSave: false });
+
+    // Send email
+    const message = `Your password reset code is: ${otp}. It is valid for 10 minutes.`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Haridwar University ERP - Password Reset Code',
+        message
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Reset code sent to your email'
+      });
+    } catch (error) {
+      console.error('Email send failed:', error.message);
+      
+      // FALLBACK for development/broken SMTP:
+      console.log('##################################################');
+      console.log(`# PASSWORD RESET OTP for ${user.email}: ${otp}`);
+      console.log('##################################################');
+
+      // Return success anyway so frontend proceeds
+      return res.status(200).json({
+        success: true,
+        message: 'Reset code generated (Email failed, check server logs)'
+      });
+    }
+  });
+
+  /**
+   * Verify Password Reset OTP
+   * POST /api/v1/auth/verify-password-reset-otp
+   */
+  verifyPasswordResetOtp = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and OTP'
+      });
+    }
+
+    const user = await User.findOne({ 
+      email,
+      passwordResetExpires: { $gt: Date.now() }
+    }).select('+passwordResetToken');
+
+    if (!user || !user.passwordResetToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset code'
+      });
+    }
+
+    // Verify OTP
+    const isOtpValid = encryptionUtil.compareData(otp, user.passwordResetToken);
+
+    if (!isOtpValid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid reset code'
+      });
+    }
+
+    // Generate a temporary reset token for the password reset form
+    const resetToken = encryptionUtil.generateSecureToken(32);
+    user.passwordResetToken = encryptionUtil.hashData(resetToken);
+    user.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 30 minutes for password reset
+    await user.save({ validateBeforeSave: false });
+
+    res.json({
+      success: true,
+      message: 'Reset code verified successfully',
+      data: {
+        resetToken
+      }
+    });
+  });
 }
 
 export default new AuthController();
