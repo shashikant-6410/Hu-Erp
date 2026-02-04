@@ -80,8 +80,11 @@ function App() {
                             element={
                                 <ProtectedRoute allowedRoles={['STUDENT']}>
                                     <ViewCourses />
-                            path="/student/attendance"
-                            element={
+                                    </ProtectedRoute>
+                            }
+                         />         
+                          <Route  path="/student/attendance"
+                        element={
                                 <ProtectedRoute allowedRoles={['STUDENT']}>
                                     <AttendanceDashboard />
                                 </ProtectedRoute>
@@ -127,6 +130,7 @@ function App() {
                                 </div>
                             }
                         />
+                        
                     </Routes>
                 </BrowserRouter>
             </QueryClientProvider>
