@@ -14,5 +14,10 @@ router.get(
   authorize('STUDENT'),
   dashboardController.getStudentDashboard
 );
+router.get(
+  '/student/schedule',
+  authorize('STUDENT'),
+  dashboardController.getTodaySchedule
+);
 
 export default router;
